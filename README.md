@@ -13,7 +13,9 @@ This approximation is too optimistic in assuming that each *Vernehmlassung* was 
 In the folder [plots](./plots) there are many plots contained which visualize some of the key features and can be used to answer some important questions.
 
 **Vernehmlassungen per year**
-![Vernehmlassung Year Plot](./plots/Vernehmlassung Year.svg)
+
+![Vernehmlassung Year Plot](https://github.com/rostro36/Vernehmlassungen/blob/master/plots/Vernehmlassung%20Year.svg)
+
 **Vernehmlassungen per department and avg/median time to law**
 ![Department Plot](./plots/Department.svg)
 
