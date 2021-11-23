@@ -19,7 +19,16 @@ In the folder [plots](./plots) there are many plots contained which visualize so
 **Vernehmlassungen per department and avg/median time to law**
 ![Department Plot](./plots/Department.svg)
 
+## Prediction results
+
+## How to run
+```
+cd your/personal/directory/Vernehmlassungen
+pipenv install
+pipenv shell
+python3 main.py
+```
 ## ToDo
 - Machine Learning model
 	- With text
-- List libraries etc.
+- Test requirements.txt
