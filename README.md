@@ -20,8 +20,6 @@ In the folder [plots](./plots) there are many plots contained which visualize so
 ![Department Plot](./plots/Department.svg)
 
 ## ToDo
-- Refactoring of code
 - Machine Learning model
-	- Without text
 	- With text
 - List libraries etc.
