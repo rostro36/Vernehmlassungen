@@ -50,11 +50,13 @@ def scrape_laws(vernehmlassungen_df):
     for _, row in vernehmlassungen_df.iterrows():
         links = row['SR_Links']
         # No Links found
-        if type(links) == float:
+        if links is None or type(links) == float:
             new_df.append([None]*8)
             continue
+
         # Compute links
-        links = literal_eval(links)
+        if type(links) == str:
+            links = literal_eval(links)
         link_count = len(links)
 
         # Init values for loop
@@ -68,7 +70,8 @@ def scrape_laws(vernehmlassungen_df):
             for link_pos in range(link_count):
                 # Link_pos already found
                 if deltas[link_pos] is None:
-                    history = get_page(HISTORY_BASE+links[link_pos]+'/history')
+                    history = get_page(
+                        HISTORY_BASE+links[link_pos]+'/history', retry)
                     deltas[link_pos], acc_dates[link_pos] = process_link(
                         history, vernehmlassung_date)
         # Untangle the different deltas
@@ -85,8 +88,8 @@ def scrape_laws(vernehmlassungen_df):
             new_df.append([None]*8)
     # concat df's
     new_df = pd.DataFrame(new_df, columns=['Months_until_decision', 'Decision_day', 'Decision_month', 'Decision_year',
-                                           'Months_until_accept', 'Accept_day', 'Accept_month', 'Accept_year'])
-    concat_df = pd.concat([vernehmlassungen_df, new_df], axis=1)
+                                           'Months_until_accept', 'Accept_day', 'Accept_month', 'Accept_year']).reset_index()
+    concat_df = pd.concat([vernehmlassungen_df.reset_index(), new_df], axis=1)
     concat_df.to_csv('laws.csv')
     return concat_df
 

@@ -1,7 +1,6 @@
 import re
 import datetime
 import pandas as pd
-from ast import literal_eval
 from variables import month_dict
 
 
@@ -86,7 +85,7 @@ def process_year(html):
             if num is not None:
                 dikt['SR_Links'] = num[0]
                 dikt['SR_Numbers'] = num[1]
-                dikt['Link_count'] = len(literal_eval(num[0]))
+                dikt['Link_count'] = len(num[0])
             else:
                 dikt['SR_Links'] = None
                 dikt['SR_Numbers'] = None
