@@ -1,5 +1,7 @@
 import re
+import datetime
 import pandas as pd
+from variables import month_dict
 
 
 def clean_text(text):
@@ -35,6 +37,7 @@ def parse_numbers(string):
     return [links, SRnumbers]
 
 
+# Values for different values
 DEPARTMENT_ARRAY = [
     r'<a _ngcontent-\w+-\w+="" id="', r'">', lambda x: x.strip()]
 TEXT_ARRAY = [r'<li _ngcontent-\w+-\w+="">\s*<span _ngcontent-\w+-\w+="">\s*',
@@ -51,10 +54,12 @@ NUMMERN_ARRAY = [r'Betroffene SR Nummer', r'</li>', lambda x: parse_numbers(x)]
 def process_year(html):
     counter = 0
     dikts = []
-    departments = re.split(DEPARTMENT_ARRAY[0], html)[
-        1:]
+    # First split
+    departments = re.split(DEPARTMENT_ARRAY[0], html)[1:]
+    # Across different departments
     for department in departments:
         dep = re.split(DEPARTMENT_ARRAY[1], department)[0]
+        # Different Vernehmlassungen
         for title in re.split(TITLE, department)[1:]:
             counter += 1
             dikt = dict()
@@ -64,26 +69,58 @@ def process_year(html):
             tex = find_values(title, TEXT_ARRAY)
             dikt['Text'] = tex
             fri = find_values(title, FRIST_ARRAY)
+            # If no Frist found
             if fri is not None:
-                dikt['Vernehmlassung Day'] = fri[0]
-                dikt['Vernehmlassung Month'] = fri[1]
-                dikt['Vernehmlassung Year'] = fri[2]
+                dikt['Vernehmlassung_Day'] = fri[0]
+                dikt['Vernehmlassung_Month'] = fri[1]
+                dikt['Vernehmlassung_Year'] = fri[2]
             else:
-                dikt['Vernehmlassung Day'] = None
-                dikt['Vernehmlassung Month'] = None
-                dikt['Vernehmlassung Year'] = None
+                dikt['Vernehmlassung_Day'] = None
+                dikt['Vernehmlassung_Month'] = None
+                dikt['Vernehmlassung_Year'] = None
             beh = find_values(title, BEHOERDE_ARRAY)
             dikt['Behoerde'] = beh
             num = find_values(title, NUMMERN_ARRAY)
+            # If no Links found
             if num is not None:
-                dikt['SR Links'] = num[0]
-                dikt['SR Numbers'] = num[1]
+                dikt['SR_Links'] = num[0]
+                dikt['SR_Numbers'] = num[1]
+                dikt['Link_count'] = len(num[0])
             else:
-                dikt['SR Links'] = None
-                dikt['SR Numbers'] = None
+                dikt['SR_Links'] = None
+                dikt['SR_Numbers'] = None
+                dikt['Link_count'] = None
             dikts.append(dikt)
+    # Concat dfs
     df = pd.DataFrame(dikts)
-    print(counter)
     if counter == 0:
         return None
     return df
+
+
+def make_date(date_string):
+    cut_date = re.split(r'</td>', date_string)[0]
+    (day, month, year) = re.split(
+        r' ', cut_date)[:3]
+    return_date = datetime.date(
+        int(year.strip()), month_dict[month.strip()], int(day.strip()[:-1]))
+    return return_date
+
+
+def process_link(history, vernehmlassung_date):
+    # Init values for loop
+    return_delta = None
+    return_acc_date = None
+    history_entries = re.split(r'<tr _ngcontent', history)[2:]
+    # Loop across different history entries
+    for entry in history_entries:
+        if len(re.split(r'class="nowrap"> [0-9]', entry)[1:]) >= 2:
+            dates = re.split(r'class="nowrap"> ', entry)[1:3]
+            decision_date = make_date(dates[0])
+            temp_accept_date = make_date(dates[1])
+            # Write dates, if they are after vernehmlassung
+            if (decision_date-vernehmlassung_date).days >= 0 and (temp_accept_date-decision_date).days >= 0:
+                return_delta = (
+                    decision_date-vernehmlassung_date).days
+                return_acc_date = temp_accept_date
+    return return_delta, return_acc_date

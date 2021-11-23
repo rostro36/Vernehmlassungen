@@ -1,7 +1,8 @@
 from requests_html import HTMLSession
+import time
 
 
-def get_page(url):
+def get_page(url, backoff):
     # create the session
     with HTMLSession() as session:
         r = session.get(url)
@@ -11,5 +12,7 @@ def get_page(url):
         print('rendered')
         # take the rendered html and find the element that we are interested in
         html = r.html.find('body')[0].html
+        # exponential backoff
+        time.sleep(2+pow(3, backoff))
         session.close()
     return str(html)
