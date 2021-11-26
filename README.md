@@ -31,7 +31,7 @@ In the folder [plots](./plots) there are many plots contained which visualize so
 
 **Vernehmlassungen per year**
 
-![Vernehmlassung Year Plot](https://github.com/rostro36/Vernehmlassungen/blob/master/plots/Vernehmlassung%20Year.svg)
+![Vernehmlassung Year Plot](./plots/Vernehmlassung_Year.svg)
 
 **Vernehmlassungen per department and avg/median time to law**
 ![Department Plot](./plots/Department.svg)
